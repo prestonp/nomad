@@ -4789,7 +4789,7 @@ type TaskGroup struct {
 	// all the tasks contained.
 	Constraints []*Constraint
 
-	//RestartPolicy of a TaskGroup
+	// RestartPolicy of a TaskGroup
 	RestartPolicy *RestartPolicy
 
 	// Tasks are the collection of tasks that this task group needs to run
@@ -5404,6 +5404,9 @@ type Task struct {
 	// Resources is the resources needed by this task
 	Resources *Resources
 
+	// RestartPolicy of a TaskGroup
+	RestartPolicy *RestartPolicy
+
 	// DispatchPayload configures how the task retrieves its input from a dispatch
 	DispatchPayload *DispatchPayloadConfig
 
@@ -5535,6 +5538,10 @@ func (t *Task) Canonicalize(job *Job, tg *TaskGroup) {
 		t.Resources = DefaultResources()
 	} else {
 		t.Resources.Canonicalize()
+	}
+
+	if t.RestartPolicy == nil {
+		t.RestartPolicy = tg.RestartPolicy
 	}
 
 	// Set the default timeout if it is not specified.

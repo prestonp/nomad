@@ -443,9 +443,6 @@ func (g *TaskGroup) Canonicalize(job *Job) {
 	if g.Count == nil {
 		g.Count = intToPtr(1)
 	}
-	for _, t := range g.Tasks {
-		t.Canonicalize(g, job)
-	}
 	if g.EphemeralDisk == nil {
 		g.EphemeralDisk = DefaultEphemeralDisk()
 	} else {
@@ -505,29 +502,19 @@ func (g *TaskGroup) Canonicalize(job *Job) {
 	var defaultRestartPolicy *RestartPolicy
 	switch *job.Type {
 	case "service", "system":
-		// These needs to be in sync with DefaultServiceJobRestartPolicy in
-		// in nomad/structs/structs.go
-		defaultRestartPolicy = &RestartPolicy{
-			Delay:    timeToPtr(15 * time.Second),
-			Attempts: intToPtr(2),
-			Interval: timeToPtr(30 * time.Minute),
-			Mode:     stringToPtr(RestartPolicyModeFail),
-		}
+		defaultRestartPolicy = defaultServiceJobRestartPolicy()
 	default:
-		// These needs to be in sync with DefaultBatchJobRestartPolicy in
-		// in nomad/structs/structs.go
-		defaultRestartPolicy = &RestartPolicy{
-			Delay:    timeToPtr(15 * time.Second),
-			Attempts: intToPtr(3),
-			Interval: timeToPtr(24 * time.Hour),
-			Mode:     stringToPtr(RestartPolicyModeFail),
-		}
+		defaultRestartPolicy = defaultBatchJobRestartPolicy()
 	}
 
 	if g.RestartPolicy != nil {
 		defaultRestartPolicy.Merge(g.RestartPolicy)
 	}
 	g.RestartPolicy = defaultRestartPolicy
+
+	for _, t := range g.Tasks {
+		t.Canonicalize(g, job)
+	}
 
 	for _, spread := range g.Spreads {
 		spread.Canonicalize()
@@ -540,6 +527,28 @@ func (g *TaskGroup) Canonicalize(job *Job) {
 	}
 	for _, s := range g.Services {
 		s.Canonicalize(nil, g, job)
+	}
+}
+
+// These needs to be in sync with DefaultServiceJobRestartPolicy in
+// in nomad/structs/structs.go
+func defaultServiceJobRestartPolicy() *RestartPolicy {
+	return &RestartPolicy{
+		Delay:    timeToPtr(15 * time.Second),
+		Attempts: intToPtr(2),
+		Interval: timeToPtr(30 * time.Minute),
+		Mode:     stringToPtr(RestartPolicyModeFail),
+	}
+}
+
+// These needs to be in sync with DefaultBatchJobRestartPolicy in
+// in nomad/structs/structs.go
+func defaultBatchJobRestartPolicy() *RestartPolicy {
+	return &RestartPolicy{
+		Delay:    timeToPtr(15 * time.Second),
+		Attempts: intToPtr(3),
+		Interval: timeToPtr(24 * time.Hour),
+		Mode:     stringToPtr(RestartPolicyModeFail),
 	}
 }
 
@@ -620,6 +629,7 @@ type Task struct {
 	Env             map[string]string
 	Services        []*Service
 	Resources       *Resources
+	RestartPolicy   *RestartPolicy
 	Meta            map[string]string
 	KillTimeout     *time.Duration `mapstructure:"kill_timeout"`
 	LogConfig       *LogConfig     `mapstructure:"logs"`
@@ -664,6 +674,14 @@ func (t *Task) Canonicalize(tg *TaskGroup, job *Job) {
 	}
 	for _, vm := range t.VolumeMounts {
 		vm.Canonicalize()
+	}
+	if t.RestartPolicy == nil {
+		t.RestartPolicy = tg.RestartPolicy
+	} else {
+		tgrp := &RestartPolicy{}
+		*tgrp = *tg.RestartPolicy
+		tgrp.Merge(t.RestartPolicy)
+		t.RestartPolicy = tgrp
 	}
 }
 

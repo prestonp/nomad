@@ -159,6 +159,10 @@ job "binstore-storagelocker" {
         destination = "/mnt/foo"
       }
 
+      restart {
+        attempts = 10
+      }
+
       logs {
         max_files     = 14
         max_file_size = 101

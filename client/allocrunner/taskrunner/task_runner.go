@@ -315,12 +315,16 @@ func NewTaskRunner(config *Config) (*TaskRunner, error) {
 	tr.taskResources = tres
 
 	// Build the restart tracker.
-	tg := tr.alloc.Job.LookupTaskGroup(tr.alloc.TaskGroup)
-	if tg == nil {
-		tr.logger.Error("alloc missing task group")
-		return nil, fmt.Errorf("alloc missing task group")
+	rp := config.Task.RestartPolicy
+	if rp == nil {
+		tg := tr.alloc.Job.LookupTaskGroup(tr.alloc.TaskGroup)
+		if tg == nil {
+			tr.logger.Error("alloc missing task group")
+			return nil, fmt.Errorf("alloc missing task group")
+		}
+		rp = tg.RestartPolicy
 	}
-	tr.restartTracker = restarts.NewRestartTracker(tg.RestartPolicy, tr.alloc.Job.Type)
+	tr.restartTracker = restarts.NewRestartTracker(rp, tr.alloc.Job.Type)
 
 	// Get the driver
 	if err := tr.initDriver(); err != nil {

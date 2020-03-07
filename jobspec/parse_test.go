@@ -215,6 +215,9 @@ func TestParse(t *testing.T) {
 										Weight:  helper.Int8ToPtr(25),
 									},
 								},
+								RestartPolicy: &api.RestartPolicy{
+									Attempts: helper.IntToPtr(10),
+								},
 								Services: []*api.Service{
 									{
 										Tags:       []string{"foo", "bar"},

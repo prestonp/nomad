@@ -813,6 +813,15 @@ func ApiTaskToStructsTask(apiTask *api.Task, structsTask *structs.Task) {
 	structsTask.Constraints = ApiConstraintsToStructs(apiTask.Constraints)
 	structsTask.Affinities = ApiAffinitiesToStructs(apiTask.Affinities)
 
+	if apiTask.RestartPolicy != nil {
+		structsTask.RestartPolicy = &structs.RestartPolicy{
+			Attempts: *apiTask.RestartPolicy.Attempts,
+			Interval: *apiTask.RestartPolicy.Interval,
+			Delay:    *apiTask.RestartPolicy.Delay,
+			Mode:     *apiTask.RestartPolicy.Mode,
+		}
+	}
+
 	if l := len(apiTask.VolumeMounts); l != 0 {
 		structsTask.VolumeMounts = make([]*structs.VolumeMount, l)
 		for i, mount := range apiTask.VolumeMounts {
