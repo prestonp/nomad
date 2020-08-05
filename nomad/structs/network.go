@@ -392,13 +392,10 @@ func (idx *NetworkIndex) AssignPorts(ask *NetworkResource) (AllocatedPorts, erro
 			// lower memory usage.
 			var dynPorts []int
 			// TODO: its more efficient to find multiple dynamic ports at once
-			dynPorts, addrErr = getDynamicPortsStochastic(used, reservedIdx[port.HostNetwork], 1)
+			desired := []Port{port}
+			dynPorts, addrErr = getDynamicPortsStochastic(used, reservedIdx[port.HostNetwork], desired)
 			if addrErr != nil {
-				// Fall back to the precise method if the random sampling failed.
-				dynPorts, addrErr = getDynamicPortsPrecise(used, reservedIdx[port.HostNetwork], 1)
-				if addrErr != nil {
-					continue
-				}
+				continue
 			}
 
 			allocPort = &AllocatedPortMapping{
@@ -474,16 +471,9 @@ func (idx *NetworkIndex) AssignNetwork(ask *NetworkResource) (out *NetworkResour
 		// lower memory usage.
 		var dynPorts []int
 		var dynErr error
-		dynPorts, dynErr = getDynamicPortsStochastic(used, ask.ReservedPorts, len(ask.DynamicPorts))
+		dynPorts, dynErr = getDynamicPortsStochastic(used, ask.ReservedPorts, ask.DynamicPorts)
 		if dynErr == nil {
 			goto BUILD_OFFER
-		}
-
-		// Fall back to the precise method if the random sampling failed.
-		dynPorts, dynErr = getDynamicPortsPrecise(used, ask.ReservedPorts, len(ask.DynamicPorts))
-		if dynErr != nil {
-			err = dynErr
-			return
 		}
 
 	BUILD_OFFER:
@@ -505,60 +495,18 @@ func (idx *NetworkIndex) AssignNetwork(ask *NetworkResource) (out *NetworkResour
 	return
 }
 
-// getDynamicPortsPrecise takes the nodes used port bitmap which may be nil if
-// no ports have been allocated yet, the network ask and returns a set of unused
-// ports to fulfil the ask's DynamicPorts or an error if it failed. An error
-// means the ask can not be satisfied as the method does a precise search.
-func getDynamicPortsPrecise(nodeUsed Bitmap, reserved []Port, numDyn int) ([]int, error) {
-	// Create a copy of the used ports and apply the new reserves
-	var usedSet Bitmap
-	var err error
-	if nodeUsed != nil {
-		usedSet, err = nodeUsed.Copy()
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		usedSet, err = NewBitmap(maxValidPort)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	for _, port := range reserved {
-		usedSet.Set(uint(port.Value))
-	}
-
-	// Get the indexes of the unset
-	dynamicPortRange := GetDynamicPortRange()
-	availablePorts := usedSet.IndexesInRange(false, uint(dynamicPortRange.Min), uint(dynamicPortRange.Max))
-
-	// Randomize the amount we need
-	if len(availablePorts) < numDyn {
-		return nil, fmt.Errorf("dynamic port selection failed")
-	}
-
-	numAvailable := len(availablePorts)
-	for i := 0; i < numDyn; i++ {
-		j := rand.Intn(numAvailable)
-		availablePorts[i], availablePorts[j] = availablePorts[j], availablePorts[i]
-	}
-
-	return availablePorts[:numDyn], nil
-}
-
 // getDynamicPortsStochastic takes the nodes used port bitmap which may be nil if
 // no ports have been allocated yet, the network ask and returns a set of unused
 // ports to fulfil the ask's DynamicPorts or an error if it failed. An error
 // does not mean the ask can not be satisfied as the method has a fixed amount
 // of random probes and if these fail, the search is aborted.
-func getDynamicPortsStochastic(nodeUsed Bitmap, reservedPorts []Port, count int) ([]int, error) {
+func getDynamicPortsStochastic(nodeUsed Bitmap, reservedPorts []Port, desired []Port) ([]int, error) {
 	var reserved, dynamic []int
 	for _, port := range reservedPorts {
 		reserved = append(reserved, port.Value)
 	}
 
-	for i := 0; i < count; i++ {
+	for _, d := range desired {
 		attempts := 0
 	PICK:
 		attempts++
@@ -567,7 +515,14 @@ func getDynamicPortsStochastic(nodeUsed Bitmap, reservedPorts []Port, count int)
 		}
 
 		dynamicPortRange := GetDynamicPortRange()
-		randPort := dynamicPortRange.Min + rand.Intn(dynamicPortRange.Max-dynamicPortRange.Min)
+		portMin, portMax := dynamicPortRange.Min, dynamicPortRange.Max
+
+		// optionally support range per desired port
+		if d.Min > 0 && d.Max > 0 {
+			portMin, portMax = d.Min, d.Max
+		}
+
+		randPort := portMin + rand.Intn(portMax-portMin+1)
 		if nodeUsed != nil && nodeUsed.Check(uint(randPort)) {
 			goto PICK
 		}

@@ -80,6 +80,8 @@ func parsePorts(networkObj *ast.ObjectList, nw *api.NetworkResource) error {
 			"static",
 			"to",
 			"host_network",
+			"max",
+			"min",
 		}
 		if err := helper.CheckHCLKeys(port.Val, valid); err != nil {
 			return err
@@ -102,6 +104,11 @@ func parsePorts(networkObj *ast.ObjectList, nw *api.NetworkResource) error {
 			return err
 		}
 		res.Label = label
+
+		if res.Min > 0 && res.Min > res.Max {
+			return fmt.Errorf("invalid range %d-%d for port: %s", res.Min, res.Max, label)
+		}
+
 		if res.Value > 0 {
 			nw.ReservedPorts = append(nw.ReservedPorts, res)
 		} else {

@@ -88,6 +88,8 @@ type Port struct {
 	Value       int    `mapstructure:"static"`
 	To          int    `mapstructure:"to"`
 	HostNetwork string `mapstructure:"host_network"`
+	Max         int    `mapstructure:"max"`
+	Min         int    `mapstructure:"min"`
 }
 
 type DNSConfig struct {
