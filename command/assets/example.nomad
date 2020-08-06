@@ -316,7 +316,7 @@ job "example" {
 
         network {
           mbits = 10
-          port "db" {}
+          port  "db"  {}
         }
       }
       # The "service" stanza instructs Nomad to register this task as a service
@@ -345,7 +345,6 @@ job "example" {
         #   interval = "10s"
         #   timeout  = "2s"
         # }
-
       }
 
       # The "template" stanza instructs Nomad to manage a template, such as

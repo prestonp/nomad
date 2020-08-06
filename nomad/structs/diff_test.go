@@ -3022,6 +3022,18 @@ func TestTaskGroupDiff(t *testing.T) {
 									},
 									{
 										Type: DiffTypeAdded,
+										Name: "Max",
+										Old:  "",
+										New:  "0",
+									},
+									{
+										Type: DiffTypeAdded,
+										Name: "Min",
+										Old:  "",
+										New:  "0",
+									},
+									{
+										Type: DiffTypeAdded,
 										Name: "To",
 										Old:  "",
 										New:  "8081",
@@ -3074,6 +3086,18 @@ func TestTaskGroupDiff(t *testing.T) {
 										Type: DiffTypeDeleted,
 										Name: "Label",
 										Old:  "foo",
+										New:  "",
+									},
+									{
+										Type: DiffTypeDeleted,
+										Name: "Max",
+										Old:  "0",
+										New:  "",
+									},
+									{
+										Type: DiffTypeDeleted,
+										Name: "Min",
+										Old:  "0",
 										New:  "",
 									},
 									{
@@ -4095,6 +4119,18 @@ func TestTaskDiff(t *testing.T) {
 											},
 											{
 												Type: DiffTypeAdded,
+												Name: "Max",
+												Old:  "",
+												New:  "0",
+											},
+											{
+												Type: DiffTypeAdded,
+												Name: "Min",
+												Old:  "",
+												New:  "0",
+											},
+											{
+												Type: DiffTypeAdded,
 												Name: "To",
 												Old:  "",
 												New:  "0",
@@ -4116,6 +4152,18 @@ func TestTaskDiff(t *testing.T) {
 												Name: "Label",
 												Old:  "",
 												New:  "baz",
+											},
+											{
+												Type: DiffTypeAdded,
+												Name: "Max",
+												Old:  "",
+												New:  "0",
+											},
+											{
+												Type: DiffTypeAdded,
+												Name: "Min",
+												Old:  "",
+												New:  "0",
 											},
 											{
 												Type: DiffTypeAdded,
@@ -4151,6 +4199,18 @@ func TestTaskDiff(t *testing.T) {
 											},
 											{
 												Type: DiffTypeDeleted,
+												Name: "Max",
+												Old:  "0",
+												New:  "",
+											},
+											{
+												Type: DiffTypeDeleted,
+												Name: "Min",
+												Old:  "0",
+												New:  "",
+											},
+											{
+												Type: DiffTypeDeleted,
 												Name: "To",
 												Old:  "0",
 												New:  "",
@@ -4171,6 +4231,18 @@ func TestTaskDiff(t *testing.T) {
 												Type: DiffTypeDeleted,
 												Name: "Label",
 												Old:  "bar",
+												New:  "",
+											},
+											{
+												Type: DiffTypeDeleted,
+												Name: "Max",
+												Old:  "0",
+												New:  "",
+											},
+											{
+												Type: DiffTypeDeleted,
+												Name: "Min",
+												Old:  "0",
 												New:  "",
 											},
 											{
@@ -4626,6 +4698,18 @@ func TestTaskDiff(t *testing.T) {
 								Name: "boom.Label",
 								Old:  "boom_port",
 								New:  "boom_port",
+							},
+							{
+								Type: DiffTypeNone,
+								Name: "boom.Max",
+								Old:  "0",
+								New:  "0",
+							},
+							{
+								Type: DiffTypeNone,
+								Name: "boom.Min",
+								Old:  "0",
+								New:  "0",
 							},
 							{
 								Type: DiffTypeNone,
