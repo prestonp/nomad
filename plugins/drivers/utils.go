@@ -128,6 +128,8 @@ func ResourcesFromProto(pb *proto.Resources) *Resources {
 				n.DynamicPorts = append(n.DynamicPorts, structs.Port{
 					Label: port.Label,
 					Value: int(port.Value),
+					Min:   int(port.Min),
+					Max:   int(port.Max),
 				})
 			}
 			r.NomadResources.Networks = append(r.NomadResources.Networks, &n)
@@ -184,6 +186,8 @@ func ResourcesToProto(r *Resources) *proto.Resources {
 				n.DynamicPorts = append(n.DynamicPorts, &proto.NetworkPort{
 					Label: port.Label,
 					Value: int32(port.Value),
+					Min:   int32(port.Min),
+					Max:   int32(port.Max),
 				})
 			}
 			pb.AllocatedResources.Networks[i] = &n

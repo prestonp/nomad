@@ -80,6 +80,8 @@ func parsePorts(networkObj *ast.ObjectList, nw *api.NetworkResource) error {
 			"static",
 			"to",
 			"host_network",
+			"max",
+			"min",
 		}
 		if err := helper.CheckHCLKeys(port.Val, valid); err != nil {
 			return err
@@ -102,6 +104,13 @@ func parsePorts(networkObj *ast.ObjectList, nw *api.NetworkResource) error {
 			return err
 		}
 		res.Label = label
+
+		// When using a dynamic port with a custom range, don't specify a range that contains one port.
+		// This is not idiomatic, instead use a static port.
+		if res.Min == res.Max && res.Min > 0 {
+			return fmt.Errorf("invalid range for port: %s", label)
+		}
+
 		if res.Value > 0 {
 			nw.ReservedPorts = append(nw.ReservedPorts, res)
 		} else {

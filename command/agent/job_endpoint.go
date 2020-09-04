@@ -1208,6 +1208,8 @@ func ApiPortToStructs(in api.Port) structs.Port {
 		Value:       in.Value,
 		To:          in.To,
 		HostNetwork: in.HostNetwork,
+		Min:         in.Min,
+		Max:         in.Max,
 	}
 }
 

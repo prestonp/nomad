@@ -2365,6 +2365,16 @@ type Port struct {
 	// to. Jobs with a HostNetwork set can only be placed on nodes with
 	// that host network available.
 	HostNetwork string
+
+	// Max is the highest port value desired when requesting a dynamic port.
+	// When configured to 0, scheduler will use the globally configured
+	// `dynamic_port_range_max` setting.
+	Max int
+
+	// Min is the lower port value desired when requesting a dynamic port.
+	// When configured to 0, scheduler will use the globally configured
+	// `dynamic_port_range_min` setting.
+	Min int
 }
 
 type DNSConfig struct {
