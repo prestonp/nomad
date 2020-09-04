@@ -1809,6 +1809,9 @@ type Node struct {
 	// Raft Indexes
 	CreateIndex uint64
 	ModifyIndex uint64
+
+	// DynamicPortRange is the port range for dynamic ports
+	DynamicPortRange PortRange
 }
 
 // Ready returns true if the node is ready for running allocations
@@ -2386,14 +2389,15 @@ type DNSConfig struct {
 // NetworkResource is used to represent available network
 // resources
 type NetworkResource struct {
-	Mode          string     // Mode of the network
-	Device        string     // Name of the device
-	CIDR          string     // CIDR block of addresses
-	IP            string     // Host IP address
-	MBits         int        // Throughput
-	DNS           *DNSConfig // DNS Configuration
-	ReservedPorts []Port     // Host Reserved ports
-	DynamicPorts  []Port     // Host Dynamically assigned ports
+	Mode             string     // Mode of the network
+	Device           string     // Name of the device
+	CIDR             string     // CIDR block of addresses
+	IP               string     // Host IP address
+	MBits            int        // Throughput
+	DNS              *DNSConfig // DNS Configuration
+	ReservedPorts    []Port     // Host Reserved ports
+	DynamicPorts     []Port     // Host Dynamically assigned ports
+	DynamicPortRange PortRange  // Dynamic port range
 }
 
 func (nr *NetworkResource) Hash() uint32 {

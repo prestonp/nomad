@@ -260,12 +260,15 @@ func (f *NetworkFingerprint) createNetworkResources(throughput int, intf *net.In
 	nwResources := make([]*structs.NetworkResource, 0)
 	linkLocals := make([]*structs.NetworkResource, 0)
 
+	dynamicPortRange := structs.GetDynamicPortRange()
+
 	for _, addr := range addrs {
 		// Create a new network resource
 		newNetwork := &structs.NetworkResource{
-			Mode:   "host",
-			Device: intf.Name,
-			MBits:  throughput,
+			Mode:             "host",
+			Device:           intf.Name,
+			MBits:            throughput,
+			DynamicPortRange: dynamicPortRange,
 		}
 
 		// Find the IP Addr and the CIDR from the Address
