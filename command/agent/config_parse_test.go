@@ -136,6 +136,8 @@ var basicConfig = &Config{
 				ServiceSchedulerEnabled: true,
 			},
 		},
+		DynamicPortRangeMin: 3000,
+		DynamicPortRangeMax: 4000,
 	},
 	ACL: &ACLConfig{
 		Enabled:          true,
@@ -604,7 +606,9 @@ var sample0 = &Config{
 		RPC:  "host.example.com",
 		Serf: "host.example.com",
 	},
-	Client: &ClientConfig{ServerJoin: &ServerJoin{}},
+	Client: &ClientConfig{
+		ServerJoin: &ServerJoin{},
+	},
 	Server: &ServerConfig{
 		Enabled:         true,
 		BootstrapExpect: 3,

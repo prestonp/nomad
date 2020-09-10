@@ -307,7 +307,9 @@
           "service_scheduler_enabled": true
         }]
       }],
-      "upgrade_version": "0.8.0"
+      "upgrade_version": "0.8.0",
+      "dynamic_port_range_min": 3000,
+      "dynamic_port_range_max": 4000
     }
   ],
   "syslog_facility": "LOCAL1",

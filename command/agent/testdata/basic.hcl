@@ -75,8 +75,9 @@ client {
     reserved_ports = "1,100,10-12"
   }
 
-  client_min_port  = 1000
-  client_max_port  = 2000
+  client_min_port = 1000
+  client_max_port = 2000
+
   max_kill_timeout = "10s"
 
   stats {
@@ -130,6 +131,8 @@ server {
   upgrade_version               = "0.8.0"
   encrypt                       = "abc"
   raft_multiplier               = 4
+  dynamic_port_range_min = 3000
+  dynamic_port_range_max = 4000
 
   server_join {
     retry_join     = ["1.1.1.1", "2.2.2.2"]
