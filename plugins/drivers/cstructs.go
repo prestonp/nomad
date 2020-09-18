@@ -14,6 +14,9 @@ type MemoryStats = cstructs.MemoryStats
 // CpuStats holds cpu usage related stats
 type CpuStats = cstructs.CpuStats
 
+// DiskStats holds disk usage related stats
+type DiskStats = cstructs.DiskStats
+
 // ResourceUsage holds information related to cpu and memory stats
 type ResourceUsage = cstructs.ResourceUsage
 

@@ -1385,6 +1385,21 @@ func (tr *TaskRunner) setGaugeForCPU(ru *cstructs.TaskResourceUsage) {
 	}
 }
 
+//TODO Remove Backwardscompat or use tr.Alloc()?
+func (tr *TaskRunner) setGaugeForDisk(ru *cstructs.TaskResourceUsage) {
+	alloc := tr.Alloc()
+
+	if !tr.clientConfig.DisableTaggedMetrics {
+		metrics.SetGaugeWithLabels([]string{"client", "allocs", "disk", "usage"},
+			float32(ru.ResourceUsage.DiskStats.UsageMB), tr.baseLabels)
+	}
+
+	if tr.clientConfig.BackwardsCompatibleMetrics {
+		metrics.SetGauge([]string{"client", "allocs", alloc.Job.Name, alloc.TaskGroup, tr.allocID, tr.taskName, "disk", "usage"},
+			float32(ru.ResourceUsage.DiskStats.UsageMB))
+	}
+}
+
 // emitStats emits resource usage stats of tasks to remote metrics collector
 // sinks
 func (tr *TaskRunner) emitStats(ru *cstructs.TaskResourceUsage) {
@@ -1402,6 +1417,12 @@ func (tr *TaskRunner) emitStats(ru *cstructs.TaskResourceUsage) {
 		tr.setGaugeForCPU(ru)
 	} else {
 		tr.logger.Debug("Skipping cpu stats for allocation", "reason", "CpuStats is nil")
+	}
+
+	if ru.ResourceUsage.DiskStats != nil {
+		tr.setGaugeForDisk(ru)
+	} else {
+		tr.logger.Debug("Skipping disk stats for allocation", "reason", "DiskStats is nil")
 	}
 }
 

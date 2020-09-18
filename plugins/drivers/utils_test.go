@@ -26,6 +26,10 @@ func TestResourceUsageRoundTrip(t *testing.T) {
 			KernelMaxUsage: 45,
 			Measured:       []string{"RSS", "Swap"},
 		},
+		DiskStats: &DiskStats{
+			Measured: []string{"Disk MB"},
+			UsageMB:  12345,
+		},
 	}
 
 	parsed := resourceUsageFromProto(resourceUsageToProto(input))

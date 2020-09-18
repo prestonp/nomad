@@ -647,6 +647,9 @@ message TaskResourceUsage {
 
     // Memory usage stats
     MemoryUsage memory = 2;
+
+    // Disk usage stats
+    DiskUsage disk = 3;
 }
 
 message CPUUsage {
@@ -690,6 +693,16 @@ message MemoryUsage {
     }
     // MeasuredFields indicates which fields were actually sampled
     repeated Fields measured_fields = 6;
+}
+
+message DiskUsage {
+    uint64 disk_mb = 1;
+
+    enum Fields {
+        DISK_MB = 0;
+    }
+    // MeasuredFields indicates which fields were actually sampled
+    repeated Fields measured_fields = 2;
 }
 
 message DriverTaskEvent {

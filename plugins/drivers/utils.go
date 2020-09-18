@@ -446,9 +446,15 @@ func resourceUsageToProto(ru *ResourceUsage) *proto.TaskResourceUsage {
 		KernelMaxUsage: ru.MemoryStats.KernelMaxUsage,
 	}
 
+	disk := &proto.DiskUsage{
+		MeasuredFields: diskUsageMeasuredFieldsToProto(ru.DiskStats.Measured),
+		DiskMb: ru.DiskStats.UsageMB,
+	}
+
 	return &proto.TaskResourceUsage{
 		Cpu:    cpu,
 		Memory: memory,
+		Disk:   disk,
 	}
 }
 
@@ -480,9 +486,18 @@ func resourceUsageFromProto(pb *proto.TaskResourceUsage) *ResourceUsage {
 		}
 	}
 
+	disk := DiskStats{}
+	if pb.Disk != nil {
+		disk = DiskStats{
+			Measured: diskUsageMeasuredFieldsFromProto(pb.Disk.MeasuredFields),
+			UsageMB: pb.Disk.DiskMb,
+		}
+	}
+
 	return &ResourceUsage{
 		CpuStats:    &cpu,
 		MemoryStats: &memory,
+		DiskStats: &disk,
 	}
 }
 
@@ -576,6 +591,37 @@ func memoryUsageMeasuredFieldsFromProto(fields []proto.MemoryUsage_Fields) []str
 	return r
 }
 
+var diskUsageMeasuredFieldToProtoMap = map[string]proto.DiskUsage_Fields{
+	"Disk MB": proto.DiskUsage_DISK_MB,
+}
+
+var diskUsageMeasuredFieldFromProtoMap = map[proto.DiskUsage_Fields]string{
+	proto.DiskUsage_DISK_MB:            "Disk MB",
+}
+
+func diskUsageMeasuredFieldsToProto(fields []string) []proto.DiskUsage_Fields {
+	r := make([]proto.DiskUsage_Fields, 0, len(fields))
+
+	for _, f := range fields {
+		if v, ok := diskUsageMeasuredFieldToProtoMap[f]; ok {
+			r = append(r, v)
+		}
+	}
+
+	return r
+}
+
+func diskUsageMeasuredFieldsFromProto(fields []proto.DiskUsage_Fields) []string {
+	r := make([]string, 0, len(fields))
+
+	for _, f := range fields {
+		if v, ok := diskUsageMeasuredFieldFromProtoMap[f]; ok {
+			r = append(r, v)
+		}
+	}
+
+	return r
+}
 func netIsolationModeToProto(mode NetIsolationMode) proto.NetworkIsolationSpec_NetworkIsolationMode {
 	switch mode {
 	case NetIsolationModeHost:

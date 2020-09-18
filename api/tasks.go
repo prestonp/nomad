@@ -41,10 +41,16 @@ type CpuStats struct {
 	Measured         []string
 }
 
+// DiskStats holds disk usage related stats
+type DiskStats struct {
+	DiskMB uint64
+}
+
 // ResourceUsage holds information related to cpu and memory stats
 type ResourceUsage struct {
 	MemoryStats *MemoryStats
 	CpuStats    *CpuStats
+	DiskStats   *DiskStats
 	DeviceStats []*DeviceGroupStats
 }
 
@@ -631,7 +637,8 @@ type DispatchPayloadConfig struct {
 }
 
 const (
-	TaskLifecycleHookPrestart = "prestart"
+	TaskLifecycleHookPrestart  = "prestart"
+	TaskLifecycleHookPoststart = "poststart"
 )
 
 type TaskLifecycle struct {

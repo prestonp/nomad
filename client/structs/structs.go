@@ -257,10 +257,28 @@ func (cs *CpuStats) Add(other *CpuStats) {
 	cs.Measured = joinStringSet(cs.Measured, other.Measured)
 }
 
+// DiskStats holds disk usage related stats
+type DiskStats struct {
+	UsageMB uint64
+
+	// A list of fields whose values were actually sampled
+	Measured []string
+}
+
+func (ds *DiskStats) Add(other *DiskStats) {
+	if other == nil {
+		return
+	}
+
+	ds.UsageMB += other.UsageMB
+	ds.Measured = joinStringSet(ds.Measured, other.Measured)
+}
+
 // ResourceUsage holds information related to cpu and memory stats
 type ResourceUsage struct {
 	MemoryStats *MemoryStats
 	CpuStats    *CpuStats
+	DiskStats   *DiskStats
 	DeviceStats []*device.DeviceGroupStats
 }
 
